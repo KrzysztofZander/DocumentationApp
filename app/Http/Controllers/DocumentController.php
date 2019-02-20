@@ -15,96 +15,94 @@ use App\Http\Resources\Document as DocumentResource;
 
 class DocumentController extends Controller
 {
-    public function checkmail()
-    {
+  public function checkmail(){
           $check=0;
           $oClient = Client::account('default');
 
-    //Connect to the IMAP Server
-    $oClient->connect();
+      //Connect to the IMAP Server
+      $oClient->connect();
 
-    //Get all Mailboxes
-    /** @var \Webklex\IMAP\Support\FolderCollection $aFolder */
-    $aFolder = $oClient->getFolders();
-    $howManyAttach=0;
+      //Get all Mailboxes
+      /** @var \Webklex\IMAP\Support\FolderCollection $aFolder */
+      $aFolder = $oClient->getFolders();
+      $howManyAttach=0;
 
-    //Loop through every Mailbox
-    /** @var \Webklex\IMAP\Folder $oFolder */
-    foreach($aFolder as $oFolder){
+      //Loop through every Mailbox
+      /** @var \Webklex\IMAP\Folder $oFolder */
+      foreach($aFolder as $oFolder){
 
-        //Get all Messages of the current Mailbox $oFolder
-        /** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
-        $aMessage = $oFolder->query()->all()->get();
-        
-        /** @var \Webklex\IMAP\Message $oMessage */
-        foreach($aMessage as $oMessage){
+          //Get all Messages of the current Mailbox $oFolder
+          /** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+          $aMessage = $oFolder->query()->all()->get();
+          
+          /** @var \Webklex\IMAP\Message $oMessage */
+          foreach($aMessage as $oMessage){
 
-          $check=1;
-            echo  $oMessage->getSubject().'<br />';
-            echo  'Attachments: '.$oMessage->getAttachments()->count().'<br />';
-            $howManyAttach+= $oMessage->getAttachments()->count();
-            /** @var \Webklex\IMAP\Message $oMessage */
+            $check=1;
+              echo  $oMessage->getSubject().'<br />';
+              echo  'Attachments: '.$oMessage->getAttachments()->count().'<br />';
+              $howManyAttach+= $oMessage->getAttachments()->count();
+              /** @var \Webklex\IMAP\Message $oMessage */
 
-            /** @var \Webklex\IMAP\Support\AttachmentCollection $aAttachment */
-            $aAttachment = $oMessage->getAttachments();
+              /** @var \Webklex\IMAP\Support\AttachmentCollection $aAttachment */
+              $aAttachment = $oMessage->getAttachments();
 
-            $aAttachment->each(function ($oAttachment) {
+              $aAttachment->each(function ($oAttachment) {
 
-                /** @var \Webklex\IMAP\Attachment $oAttachment */
-                $fileName = str_random(32).".pdf";
-                $path = 'E:\DocumentationApp\storage\app\Pdf_Files';
-                $oAttachment->save($path, $fileName );
-                //Storage::put($fileName, $oAttachment);
+                  /** @var \Webklex\IMAP\Attachment $oAttachment */
+                  $fileName = str_random(32).".pdf";
+                  $path = 'E:\DocumentationApp\storage\app\Pdf_Files';
+                  $oAttachment->save($path, $fileName );
+                  //Storage::put($fileName, $oAttachment);
 
-                $document = new Document;
-                $document->file = $fileName;
-                $document->status = "wprowadzony";
+                  $document = new Document;
+                  $document->file = $fileName;
+                  $document->status = "wprowadzony";
 
-                //test
-                if($i=rand(1,2)==1){
-                $document->company = "retencja";
-                $document->description = "qwertydsadsadsadsdsadasdsa";
-                $document->typeOfDoc = "Umowa";
-                $document->InOrOut = "Przychodzący";
-                }
-                else{
-                $document->company = "biopro";
-                $document->description = "abcdedsadsadsadsadsadsa";
-                $document->typeOfDoc = "Faktura";
-                $document->InOrOut = "Wychodzący";
-                }
-                $document->numberOnDoc = rand(100,1000);
+                  //test
+                  if($i=rand(1,2)==1){
+                  $document->company = "retencja";
+                  $document->description = "qwertydsadsadsadsdsadasdsa";
+                  $document->typeOfDoc = "Umowa";
+                  $document->InOrOut = "Przychodzący";
+                  }
+                  else{
+                  $document->company = "biopro";
+                  $document->description = "abcdedsadsadsadsadsadsa";
+                  $document->typeOfDoc = "Faktura";
+                  $document->InOrOut = "Wychodzący";
+                  }
+                  $document->numberOnDoc = rand(100,1000);
 
-                $date = Carbon::create(2018, 2, 28, 0, 0, 0);
-                $document->dateOfDoc = $date->addWeeks(rand(1, 52))->format('Y-m-d H:i:s');
-                $document->counterparty = "Kontrahent 1";
+                  $date = Carbon::create(2018, 2, 28, 0, 0, 0);
+                  $document->dateOfDoc = $date->addWeeks(rand(1, 52))->format('Y-m-d H:i:s');
+                  $document->counterparty = "Kontrahent 1";
 
-                //test
+                  //test
 
-                $document->name = $oAttachment->getName();
-                $document->save();
-            });
+                  $document->name = $oAttachment->getName();
+                  $document->save();
+              });
 
-            
+              
 
         }
-    }
-    if($check!=0){
-        return redirect()->back()->with('msg', 'Pobrano dokumentów : '.$howManyAttach);
-    }
-    else{
-        return redirect()->back()->with('msg_er', 'Brak nowych dokumentów w skrzynce');
+      }
+      if($check!=0){
+          return redirect()->back()->with('msg', 'Pobrano dokumentów : '.$howManyAttach);
+      }
+      else{
+          return redirect()->back()->with('msg_er', 'Brak nowych dokumentów w skrzynce');
 
-    }
+      }
 
   }
 
   public function getDoc(){
 
-    $documents = Document::orderBy('created_at', 'desc')->get();
+    $documents = Document::orderBy('id', 'desc')->get();
 
     return DocumentResource::collection($documents);
-
     
   }
 
@@ -146,10 +144,15 @@ class DocumentController extends Controller
 
   }
 
-   Public function saveDoc (Request $request){
+  Public function saveDoc (Request $request){
 
     $document = Document::findOrFail($request->document_id);
     $document->counterparty = $request->input('counterparty');
+    $document->inOrOut = $request->input('inOrOut');
+    $document->company = $request->input('company');
+    $document->dateOfDoc = $request->input('dateOfDoc');
+    $document->typeOfDoc = $request->input('typeOfDoc');
+    $document->numberOnDoc = $request->input('numberOnDoc');
 
     if( $request->input('name') != $document->name){
       $document->name = $request->input('name').".pdf";
@@ -159,7 +162,7 @@ class DocumentController extends Controller
        return new DocumentResource($document);
      }
 
-   }
+  }
 
   public function deleteDoc($id){
 
@@ -179,6 +182,33 @@ class DocumentController extends Controller
 
     return response()->file(storage_path("app\Pdf_Files\\".$document->file));
 
+  }
+
+  public function counterparty(){
+
+    $documents = Document::orderBy('id', 'desc')->get();
+
+    $helpArray = array();
+    $array = array();
+    $allCounterparty = array();
+    $i=1;
+    foreach ($documents as $document) {
+      
+      if( !in_array($document->counterparty, $helpArray) ){
+        $array =[
+          'id'=> $i++,
+          'name' => $document->counterparty
+        ];
+        array_push($allCounterparty, $array);
+        array_push($helpArray, $document->counterparty);
+      }
+    }
+    $allCounterparty = [
+      "data" => $allCounterparty
+    ];
+
+    return $allCounterparty;
+    
   }
 
 

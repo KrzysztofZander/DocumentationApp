@@ -29,3 +29,6 @@ Route::get('/Doc/{id}', 'DocumentController@downloadDoc')->name('downloadDoc');
 // PODGLĄD DOKUMENTU
 Route::get('/displayDoc/{id}', 'DocumentController@displayDoc')->name('displayDoc');
 
+
+Route::get('/counterparty', 'DocumentController@counterparty')->name('counterparty');
+

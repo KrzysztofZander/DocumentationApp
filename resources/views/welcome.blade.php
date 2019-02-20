@@ -99,7 +99,7 @@
         <show-document></show-document>
         </div>
 
-    <div class="addFile" style="float:left;">
+    <div class="addFile" style="float:left; width: 400px;">
 
     <div id="addNewFile" >
         <h2>Dodaj nowy dokument</h2>

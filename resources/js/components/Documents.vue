@@ -1,6 +1,6 @@
 <template>
   <div>
-      <div class="col-sm-12 col-md-9" style="float:left;" >
+      <div class="col-sm-10 col-md-10" style="float:left; width: 77%" >
 
             <div  v-if="searchByCompany== 'retencja'" class="card-header" style="text-align: center; font-size: 40px; background-color: #38c172">
               Retencja
@@ -99,13 +99,47 @@
             <!-- EDYCJA DOKUMENTÓW -->
             <tr v-if="(edit_id==document.id)" style="background-color: #f5d2de;" >
               <th scope="row">{{document.id}}</th>
-              <td><input type="text" style="width: 100px;" placeholder="Nazwa" v-model="document.name" ></td>
-              <td>{{document.company}}</td>
-              <td>{{document.inOrOut}}</td>
-              <td> <input type="text" style="width: 100px;" placeholder="Kontrahent" v-model="document.counterparty" > </td>
-              <td>{{document.dateOfDoc}}</td>
-              <td>{{document.typeOfDoc}}</td>
-              <td>{{document.numberOnDoc}}</td>
+              <!-- EDYCJA NAZWY -->
+              <td><input type="text" style="width: 100px;" placeholder="Nazwa" v-model="document.name" v-once  ></td>
+              
+              <!-- EDYCJA SPÓŁKI -->
+              <td>
+                <select  class="form-control" name="company" style="width: 100px;" v-model="document.company">
+                    <option value="" disabled selected>Wybierz firme</option>
+                    <option value="retencja"> Retencja </option>
+                    <option value="biopro"> Biopro </option>
+                </select></td>
+              <!-- EDYCJA KIERUNKU -->
+              <td>
+                <select  class="form-control" name="inOrOut" style="width: 90px;" v-model="document.inOrOut">>
+                    <option value="" disabled selected>Wybierz kierunek</option>
+                    <option value="Przychodzący"> Przychodzący </option>
+                    <option value="Wychodzący"> Wychodzący </option>
+                </select>
+              </td>
+              <!-- EDYCJA KONTRAHENTA -->
+              <td>
+              <select  class="form-control" name="company" v-model="document.counterparty" >
+                  <option value="" disabled selected>Wybierz firme</option>
+                  <option v-for="counterparty in counterpartys" v-bind:key="counterparty.id" > {{counterparty.name}} </option>
+              </select>
+              </td>
+              <!-- EDYCJA DATY NA DOKUMENCIE -->
+              <td>
+                <input type="text" class="form-control" placeholder="Data" style="width: 120px;" onfocus="(this.type='date')" name="dateOfDoc" v-model="document.dateOfDoc">
+              </td>
+              <!-- EDYCJA TYPU DOKUMENTU -->
+              <td>
+                <select class="form-control" placeholder="Typ dokumentu" name="typeOfDoc" v-model="document.typeOfDoc">
+                  <option value="Faktura"> Faktura </option>
+                  <option value="Umowa"> Umowa </option>
+                  <option value="Inne"> Inne </option>
+                </select>
+              </td>
+              <!-- EDYCJA NUMERU NA DOKUMENCIE -->
+              <td>
+                <input type="text" class="form-control" placeholder="Numer na dok." name="numberOnDoc" v-model="document.numberOnDoc" >
+              </td>
               <td >{{document.shortDesc}}</td>
               <td>{{document.status}}</td>
               <td>{{document.created_at}}</td>
@@ -127,7 +161,6 @@
         <li v-bind:class="[{disabled: !pagination.next_page_url}]" class="page-item"><a class="page-link" href="#" @click="fetchDocuments(pagination.next_page_url)">Następna</a></li>
       </ul>     
     </nav>
-
     </div>
   </div>
 </template>
@@ -147,6 +180,11 @@
                 searchByDescription:'',
                 searchByStatus:'',
                 searchByCreatedAt:'',
+                counterpartys:[],
+                counterparty:{
+                  id:'',
+                  name:'',
+                },
                 documents: [],
                 document:{
                     id:'',
@@ -169,9 +207,10 @@
         },
         created() {
             this.fetchDocuments();
+            this.fetchCounterparty();
     },
     methods:{
-    fetchDocuments(page_url) {
+  fetchDocuments(page_url) {
       let vm = this;
       page_url = page_url || '/api/Doc';
       fetch(page_url)
@@ -182,8 +221,18 @@
         })
         .catch(err => console.log(err));
         
-    },
-    makePagination(meta, links) {
+  },
+
+  fetchCounterparty(){
+      fetch('api/counterparty')
+      .then(res => res.json())
+      .then(res => {
+        this.counterpartys = res.data
+        })
+        .catch(err => console.log(err));
+  },
+
+  makePagination(meta, links) {
       let pagination = {
         current_page: meta.current_page,
         last_page: meta.last_page,
@@ -191,29 +240,29 @@
         prev_page_url: links.prev
       };
       this.pagination = pagination;
-    },
+  },
 
-    downloadFile(id, name){
+  downloadFile(id, name){
       if (confirm(`Pobrać dokument ${name} ?` )){
-      axios({
-  url: `/api/Doc/${id}`,
-  method: 'GET',
-  responseType: 'blob',})
-  .then((response) => {
-   const url = window.URL.createObjectURL(new Blob([response.data]));
-   const link = document.createElement('a');
-   link.href = url;
-   link.setAttribute('download', `${name}`);
-   document.body.appendChild(link);
-   link.click();
-});
-    }
+        axios({
+          url: `/api/Doc/${id}`,
+          method: 'GET',
+          responseType: 'blob',})
+          .then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `${name}`);
+          document.body.appendChild(link);
+          link.click();
+        });
+      }
   },
 
   editDocument(document){
     this.edit_id = document.id;
-
   },
+
   cancelEdit(){
     this.edit_id=0;
     this.fetchDocuments();
@@ -261,12 +310,10 @@
           .catch(err => console.log(err));
       }
   },
+  
   displayDoc(id){
     window.open(`api/displayDoc/${id}`);
     }
-  
-  
-
   },
     computed: {
         filteredDocs() {
@@ -286,9 +333,11 @@
                         (document.typeOfDoc.match(this.searchByTypeOfDoc))&&
                         (document.numberOnDoc.match(this.searchByNumberOnDoc))&&
                         (document.description.toUpperCase().match(this.searchByDescription.toUpperCase()))
+                        console.log(this.document.name)
                         
             });
-        },
+      }
+
     },
 }
 </script>

@@ -1897,6 +1897,39 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1911,6 +1944,11 @@ __webpack_require__.r(__webpack_exports__);
       searchByDescription: '',
       searchByStatus: '',
       searchByCreatedAt: '',
+      counterpartys: [],
+      counterparty: {
+        id: '',
+        name: ''
+      },
       documents: [],
       document: {
         id: '',
@@ -1933,6 +1971,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.fetchDocuments();
+    this.fetchCounterparty();
   },
   methods: {
     fetchDocuments: function fetchDocuments(page_url) {
@@ -1945,6 +1984,17 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (res) {
         _this.documents = res.data;
         vm.makePagination(res.meta, res.links);
+      }).catch(function (err) {
+        return console.log(err);
+      });
+    },
+    fetchCounterparty: function fetchCounterparty() {
+      var _this2 = this;
+
+      fetch('api/counterparty').then(function (res) {
+        return res.json();
+      }).then(function (res) {
+        _this2.counterpartys = res.data;
       }).catch(function (err) {
         return console.log(err);
       });
@@ -1982,7 +2032,7 @@ __webpack_require__.r(__webpack_exports__);
       this.fetchDocuments();
     },
     addDocument: function addDocument(document) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.edit_id = '';
       this.document.id = document.id;
@@ -2007,14 +2057,14 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (data) {
         alert('Zapisano zmiany');
 
-        _this2.fetchDocuments();
+        _this3.fetchDocuments();
       }).catch(function (err) {
         return console.log(err);
       });
       this.edit = false;
     },
     deleteDocument: function deleteDocument(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (confirm('Usunąć dokument?')) {
         fetch("api/Doc/".concat(id), {
@@ -2024,7 +2074,7 @@ __webpack_require__.r(__webpack_exports__);
         }).then(function (data) {
           alert('Usunięto!');
 
-          _this3.fetchDocuments();
+          _this4.fetchDocuments();
         }).catch(function (err) {
           return console.log(err);
         });
@@ -2036,12 +2086,13 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredDocs: function filteredDocs() {
-      var _this4 = this;
+      var _this5 = this;
 
       return this.documents.filter(function (document) {
         document.id = document.id.toString();
         document.numberOnDoc = document.numberOnDoc.toString();
-        return document.id.match(_this4.searchById) && document.name.toUpperCase().match(_this4.searchByName.toUpperCase()) && document.status.match(_this4.searchByStatus) && document.counterparty.toUpperCase().match(_this4.searchByCounterparty.toUpperCase()) && document.company.match(_this4.searchByCompany) && document.inOrOut.match(_this4.searchByInOrOut) && document.created_at.match(_this4.searchByCreatedAt) && document.dateOfDoc.match(_this4.searchByDateOfDoc) && document.typeOfDoc.match(_this4.searchByTypeOfDoc) && document.numberOnDoc.match(_this4.searchByNumberOnDoc) && document.description.toUpperCase().match(_this4.searchByDescription.toUpperCase());
+        return document.id.match(_this5.searchById) && document.name.toUpperCase().match(_this5.searchByName.toUpperCase()) && document.status.match(_this5.searchByStatus) && document.counterparty.toUpperCase().match(_this5.searchByCounterparty.toUpperCase()) && document.company.match(_this5.searchByCompany) && document.inOrOut.match(_this5.searchByInOrOut) && document.created_at.match(_this5.searchByCreatedAt) && document.dateOfDoc.match(_this5.searchByDateOfDoc) && document.typeOfDoc.match(_this5.searchByTypeOfDoc) && document.numberOnDoc.match(_this5.searchByNumberOnDoc) && document.description.toUpperCase().match(_this5.searchByDescription.toUpperCase());
+        console.log(_this5.document.name);
       });
     }
   }
@@ -43512,7 +43563,10 @@ var render = function() {
   return _c("div", [
     _c(
       "div",
-      { staticClass: "col-sm-12 col-md-9", staticStyle: { float: "left" } },
+      {
+        staticClass: "col-sm-10 col-md-10",
+        staticStyle: { float: "left", width: "77%" }
+      },
       [
         _vm.searchByCompany == "retencja"
           ? _c(
@@ -44057,32 +44111,217 @@ var render = function() {
                         ]),
                         _vm._v(" "),
                         _c("td", [
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: document.name,
-                                expression: "document.name"
-                              }
-                            ],
-                            staticStyle: { width: "100px" },
-                            attrs: { type: "text", placeholder: "Nazwa" },
-                            domProps: { value: document.name },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
+                          _vm._o(
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: document.name,
+                                  expression: "document.name"
                                 }
-                                _vm.$set(document, "name", $event.target.value)
+                              ],
+                              staticStyle: { width: "100px" },
+                              attrs: { type: "text", placeholder: "Nazwa" },
+                              domProps: { value: document.name },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    document,
+                                    "name",
+                                    $event.target.value
+                                  )
+                                }
                               }
-                            }
-                          })
+                            }),
+                            0,
+                            document.id
+                          )
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(document.company))]),
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: document.company,
+                                  expression: "document.company"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              staticStyle: { width: "100px" },
+                              attrs: { name: "company" },
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    document,
+                                    "company",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                {
+                                  attrs: {
+                                    value: "",
+                                    disabled: "",
+                                    selected: ""
+                                  }
+                                },
+                                [_vm._v("Wybierz firme")]
+                              ),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "retencja" } }, [
+                                _vm._v(" Retencja ")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "biopro" } }, [
+                                _vm._v(" Biopro ")
+                              ])
+                            ]
+                          )
+                        ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(document.inOrOut))]),
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: document.inOrOut,
+                                  expression: "document.inOrOut"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              staticStyle: { width: "90px" },
+                              attrs: { name: "inOrOut" },
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    document,
+                                    "inOrOut",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(">\n                  "),
+                              _c(
+                                "option",
+                                {
+                                  attrs: {
+                                    value: "",
+                                    disabled: "",
+                                    selected: ""
+                                  }
+                                },
+                                [_vm._v("Wybierz kierunek")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "option",
+                                { attrs: { value: "Przychodzący" } },
+                                [_vm._v(" Przychodzący ")]
+                              ),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "Wychodzący" } }, [
+                                _vm._v(" Wychodzący ")
+                              ])
+                            ]
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: document.counterparty,
+                                  expression: "document.counterparty"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: { name: "company" },
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    document,
+                                    "counterparty",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                {
+                                  attrs: {
+                                    value: "",
+                                    disabled: "",
+                                    selected: ""
+                                  }
+                                },
+                                [_vm._v("Wybierz firme")]
+                              ),
+                              _vm._v(" "),
+                              _vm._l(_vm.counterpartys, function(counterparty) {
+                                return _c("option", { key: counterparty.id }, [
+                                  _vm._v(" " + _vm._s(counterparty.name) + " ")
+                                ])
+                              })
+                            ],
+                            2
+                          )
+                        ]),
                         _vm._v(" "),
                         _c("td", [
                           _c("input", {
@@ -44090,13 +44329,19 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: document.counterparty,
-                                expression: "document.counterparty"
+                                value: document.dateOfDoc,
+                                expression: "document.dateOfDoc"
                               }
                             ],
-                            staticStyle: { width: "100px" },
-                            attrs: { type: "text", placeholder: "Kontrahent" },
-                            domProps: { value: document.counterparty },
+                            staticClass: "form-control",
+                            staticStyle: { width: "120px" },
+                            attrs: {
+                              type: "text",
+                              placeholder: "Data",
+                              onfocus: "(this.type='date')",
+                              name: "dateOfDoc"
+                            },
+                            domProps: { value: document.dateOfDoc },
                             on: {
                               input: function($event) {
                                 if ($event.target.composing) {
@@ -44104,7 +44349,7 @@ var render = function() {
                                 }
                                 _vm.$set(
                                   document,
-                                  "counterparty",
+                                  "dateOfDoc",
                                   $event.target.value
                                 )
                               }
@@ -44112,11 +44357,91 @@ var render = function() {
                           })
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(document.dateOfDoc))]),
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: document.typeOfDoc,
+                                  expression: "document.typeOfDoc"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                placeholder: "Typ dokumentu",
+                                name: "typeOfDoc"
+                              },
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    document,
+                                    "typeOfDoc",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            [
+                              _c("option", { attrs: { value: "Faktura" } }, [
+                                _vm._v(" Faktura ")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "Umowa" } }, [
+                                _vm._v(" Umowa ")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "Inne" } }, [
+                                _vm._v(" Inne ")
+                              ])
+                            ]
+                          )
+                        ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(document.typeOfDoc))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(document.numberOnDoc))]),
+                        _c("td", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: document.numberOnDoc,
+                                expression: "document.numberOnDoc"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              placeholder: "Numer na dok.",
+                              name: "numberOnDoc"
+                            },
+                            domProps: { value: document.numberOnDoc },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  document,
+                                  "numberOnDoc",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(document.shortDesc))]),
                         _vm._v(" "),
